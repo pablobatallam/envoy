@@ -1,13 +1,14 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: myapp-envoy
+  name: httpd-discovery
+  namespace: envoy
 spec:
   clusterIP: None
   ports:
-  - name: http
-    port: 80
-    targetPort: http
-    protocol: TCP
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
   selector:
-    app: myapp-envoy
+    app: nginx-pmb
+  type: ClusterIP

@@ -6,12 +6,12 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: nginx
+      app: nginx-pmb
   replicas: 2 # indica al controlador que ejecute 2 pods
   template:
     metadata:
       labels:
-        app: nginx
+        app: nginx-pmb
     spec:
       containers:
       - name: nginx
