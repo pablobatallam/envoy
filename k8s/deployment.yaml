@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: myapp-envoy
-        image: mydockerhub/mycustomenvoy
+        image: harbor.local/pmb/envoy:1
         imagePullPolicy: Always
         env:
         - name: "ENVOY_LB_ALG"
