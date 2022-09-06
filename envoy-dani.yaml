@@ -120,7 +120,7 @@ static_resources:
         - endpoint:
             address:
               socket_address:
-                address: ms1-micros-performance-micros-performance.apps.ocpcto01.sgt.pre.weu1.azure.paas.cloudcenter.corp
+                address: httpd-discovery
                 port_value: 80
                 
 #    transport_socket:

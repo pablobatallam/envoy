@@ -1,3 +1,3 @@
-FROM envoyproxy/envoy-dev:8537d2a29265e61aaa0349311e6fc5d592659b08
-COPY envoy-http.yaml /etc/envoy-http.yaml
+FROM envoyproxy/envoy:v1.23-latest
+COPY envoy-dani.yaml /etc/envoy-http.yaml
 CMD /usr/local/bin/envoy -c /etc/envoy-http.yaml

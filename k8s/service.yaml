@@ -6,9 +6,9 @@ metadata:
 spec:
   clusterIP: None
   ports:
-    - protocol: TCP
+    - name: http
       port: 80
       targetPort: 8080
+      protocol: TCP
   selector:
     app: nginx-pmb
-  type: ClusterIP
