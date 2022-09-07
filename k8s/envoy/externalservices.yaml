@@ -1,0 +1,26 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api 
+  namespace: envoy
+  labels:
+    app: envoy
+spec:
+  type: ExternalName
+  externalName: api.microservice.svc.cluster.local
+  ports:
+    - port: 9090
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: envoy
+  labels:
+    app: envoy
+spec:
+  type: ExternalName
+  externalName: frontend.microservice.svc.cluster.local
+  ports:
+    - port: 9090
