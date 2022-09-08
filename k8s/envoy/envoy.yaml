@@ -45,6 +45,32 @@ data:
               - name: envoy.filters.http.router
                 typed_config:
                   "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
+              # evaluate JWT tokens, allow_missing allows API Key also
+              - name: envoy.filters.http.jwt_authn
+                typed_config: 
+                  "@type": type.googleapis.com/envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication
+                  providers:
+                    apigee:
+                      issuer: https://sanes-devinternet.weu.apis.sandigital.dev.corp/remote-token/token
+                      audiences:
+                      - remote-service-client
+                      remote_jwks:
+                        http_uri:
+                          uri: https://sanes-devinternet.weu.apis.sandigital.dev.corp/remote-token/certs
+                          cluster: apigee-auth-service
+                          timeout: 5s
+                        cache_duration:
+                          seconds: 300
+                      payload_in_metadata: https://sanes-devinternet.weu.apis.sandigital.dev.corp/remote-token/token
+                  rules:
+                  - match:
+                      prefix: /
+                    requires:
+                      requires_any:
+                        requirements:
+                        - provider_name: apigee
+                        - allow_missing: {}
+                    
               route_config:
                 name: local_route
                 virtual_hosts:
