@@ -82,7 +82,7 @@ data:
         type: strict_dns
         lb_policy: round_robin
         load_assignment:
-          cluster_name: terminal
+          cluster_name: api
           endpoints:
           - lb_endpoints:
             - endpoint:
