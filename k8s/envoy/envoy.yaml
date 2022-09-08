@@ -44,10 +44,6 @@ data:
                   "@type": type.googleapis.com/envoy.extensions.access_loggers.stream.v3.StdoutAccessLog
 
               http_filters:
-              - name: envoy.filters.http.router
-                typed_config:
-                  "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
-
               # evaluate JWT tokens, allow_missing allows API Key also
               - name: envoy.filters.http.jwt_authn
                 typed_config: 
@@ -73,6 +69,9 @@ data:
                         requirements:
                         - provider_name: apigee
                         - allow_missing: {}
+              - name: envoy.filters.http.router
+                typed_config:
+                  "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
 
               route_config:
                 name: local_route
