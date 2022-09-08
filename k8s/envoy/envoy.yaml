@@ -45,6 +45,20 @@ data:
               - name: envoy.filters.http.router
                 typed_config:
                   "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
+              route_config:
+                name: local_route
+                virtual_hosts:
+                - name: local_service
+                  domains: ["*"]
+                  routes:
+                  - match:
+                      prefix: "/"
+                    route:
+                      cluster: frontend
+                  - match:
+                      prefix: "/api"
+                    route:
+                      cluster: api
               # evaluate JWT tokens, allow_missing allows API Key also
               - name: envoy.filters.http.jwt_authn
                 typed_config: 
@@ -70,21 +84,6 @@ data:
                         requirements:
                         - provider_name: apigee
                         - allow_missing: {}
-                    
-              route_config:
-                name: local_route
-                virtual_hosts:
-                - name: local_service
-                  domains: ["*"]
-                  routes:
-                  - match:
-                      prefix: "/"
-                    route:
-                      cluster: frontend
-                  - match:
-                      prefix: "/api"
-                    route:
-                      cluster: api
 
       clusters:
       - name: frontend
