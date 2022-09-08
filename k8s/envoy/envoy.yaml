@@ -10,7 +10,7 @@ spec:
   type: ClusterIP
   ports:
     - port: 80
-      targetPort: 80
+      targetPort: 8080
   selector:
     app: envoy
 
@@ -30,7 +30,7 @@ data:
         address:
           socket_address:
             address: 0.0.0.0
-            port_value: 10000
+            port_value: 8080
         filter_chains:
         - filters:
           - name: envoy.filters.network.http_connection_manager
