@@ -31,6 +31,7 @@ data:
           socket_address:
             address: 0.0.0.0
             port_value: 8080
+
         filter_chains:
         - filters:
           - name: envoy.filters.network.http_connection_manager
@@ -46,6 +47,32 @@ data:
               - name: envoy.filters.http.router
                 typed_config:
                   "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
+
+              # evaluate JWT tokens, allow_missing allows API Key also
+              - name: envoy.filters.http.jwt_authn
+                typed_config: 
+                  "@type": type.googleapis.com/envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication
+                  providers:
+                    apigee:
+                      issuer: https://sanes-devinternet.weu.apis.sandigital.dev.corp/remote-token/token
+                      audiences:
+                      - remote-service-client
+                      remote_jwks:
+                        http_uri:
+                          uri: https://sanes-devinternet.weu.apis.sandigital.dev.corp/remote-token/certs
+                          cluster: apigee-auth-service
+                          timeout: 5s
+                        cache_duration:
+                          seconds: 300
+                      payload_in_metadata: https://sanes-devinternet.weu.apis.sandigital.dev.corp/remote-token/token
+                  rules:
+                  - match:
+                      prefix: /
+                    requires:
+                      requires_any:
+                        requirements:
+                        - provider_name: apigee
+                        - allow_missing: {}
 
               route_config:
                 name: local_route
@@ -91,6 +118,28 @@ data:
                     address: api
                     port_value: 9090
                     ipv4_compat: true
+
+      # define cluster for Apigee JWKS certs
+      - name: apigee-auth-service
+        connect_timeout: 2s
+        type: LOGICAL_DNS
+        dns_lookup_family: V4_ONLY
+        lb_policy: ROUND_ROBIN
+        load_assignment:
+          cluster_name: apigee-auth-service
+          endpoints:
+          - lb_endpoints:
+            - endpoint:
+                address:
+                  socket_address:
+                    address: sanes-devinternet.weu.apis.sandigital.dev.corp
+                    port_value: 443
+        transport_socket:
+          name: envoy.transport_sockets.tls
+          typed_config:
+            "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.UpstreamTlsContext
+            sni: "sanes-devinternet.weu.apis.sandigital.dev.corp"
+
 ---
 apiVersion: apps/v1
 kind: Deployment
