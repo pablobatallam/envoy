@@ -52,13 +52,31 @@ data:
                   domains: ["*"]
                   routes:
                   - match:
+                      prefix: "/"
+                    route:
+                      cluster: frontend
+                  - match:
                       prefix: "/api"
                     route:
                       cluster: api
 
       clusters:
+      - name: frontend
+        connect_timeout: 1.00s
+        type: strict_dns
+        lb_policy: round_robin
+        load_assignment:
+          cluster_name: frontend
+          endpoints:
+          - lb_endpoints:
+            - endpoint:
+                address:
+                  socket_address:
+                    address: frontend
+                    port_value: 9090
+                    ipv4_compat: true
       - name: api
-        connect_timeout: 0.25s
+        connect_timeout: 1.00s
         type: strict_dns
         lb_policy: round_robin
         load_assignment:
