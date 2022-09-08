@@ -142,7 +142,8 @@ spec:
             path: envoy.yaml
       containers:
         - name: envoy
-          image: envoyproxy/envoy-alpine:v1.13.1
+          #image: envoyproxy/envoy-alpine:v1.13.1
+          image: envoyproxy/envoy-dev:8537d2a29265e61aaa0349311e6fc5d592659b08
           ports:
             - containerPort: 80
           volumeMounts:
