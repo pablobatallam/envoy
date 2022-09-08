@@ -69,6 +69,19 @@ data:
                         requirements:
                         - provider_name: apigee
                         - allow_missing: {}
+
+               # evaluate Apigee rules
+              - name: envoy.filters.http.ext_authz
+                typed_config:
+                  "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz
+                  transport_api_version: V3
+                  grpc_service:
+                    envoy_grpc:
+                      cluster_name: apigee-remote-service-envoy
+                    timeout: 1s
+                  metadata_context_namespaces:
+                  - envoy.filters.http.jwt_authn
+              
               - name: envoy.filters.http.router
                 typed_config:
                   "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
@@ -79,10 +92,6 @@ data:
                 - name: local_service
                   domains: ["*"]
                   routes:
-                  - match:
-                      prefix: "/"
-                    route:
-                      cluster: frontend
                   - match:
                       prefix: "/api"
                     route:
@@ -139,6 +148,35 @@ data:
             "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.UpstreamTlsContext
             sni: "sanes-devinternet.weu.apis.sandigital.dev.corp"
 
+      # define cluster for Apigee remote service
+      - name: apigee-remote-service-envoy
+        type: LOGICAL_DNS
+        typed_extension_protocol_options:
+          envoy.extensions.upstreams.http.v3.HttpProtocolOptions:
+            "@type": type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions
+            explicit_http_config:
+              http2_protocol_options: {}
+        load_assignment:
+          cluster_name: apigee-remote-service-envoy
+          endpoints:
+          - lb_endpoints:
+            - endpoint:
+                address:
+                  socket_address:
+                    address: apigee-remot-system.sandbox-test.svc.cluster.local
+                    port_value: 5000
+        common_lb_config:
+          healthy_panic_threshold:
+            value: 50.0
+        health_checks:
+          - timeout: 1s
+            interval: 5s
+            interval_jitter: 1s
+            no_traffic_interval: 5s
+            unhealthy_threshold: 1
+            healthy_threshold: 3
+            grpc_health_check: {}
+        connect_timeout: 0.25s
 ---
 apiVersion: apps/v1
 kind: Deployment
